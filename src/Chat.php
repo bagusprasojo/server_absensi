@@ -5,11 +5,12 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class Chat implements MessageComponentInterface {
-    protected $clients;
+    protected $clients = [];
+
     public $conn_db;
 
     public function __construct() {
-        $this->clients = new \SplObjectStorage;
+        // $this->clients = new \SplObjectStorage;
 
         if(!$this->conn_db = mysqli_connect("localhost","tsmarto", "Noki@3310","smart_building")) {
             die('No connection 1: ' . mysqli_connect_error());
@@ -19,7 +20,14 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onOpen(ConnectionInterface $conn) {
-        $this->clients->attach($conn);
+        $data = [
+            'id' => $conn->resourceId,
+            'nickname' => 'user_' . $conn->resourceId,
+            'logged_in' => false,
+            'conn' => $conn
+        ];
+
+        // $this->clients->attach($conn);
         echo "Koneksi baru! ({$conn->resourceId})\n";
 
         $sql = "select id,nip,nama,jabatan,perusahaan, tgl_hadir from undangan where is_hadir=1";
@@ -45,6 +53,19 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
+        if (trim($message) === '') {
+            return;
+        }
+        
+        $sql = "update undangan set is_hadir = 1, tgl_hadir = now() where nip = '" . $msg . "'";
+        echo $sql . "\n";
+        
+        if (mysqli_query($this->conn_db, $sql)) {
+          echo "Record updated successfully";
+        } else {
+          echo "Error updating record: " . mysqli_error($conn);
+        }
+
         $sql = "select id,nip,nama,jabatan,perusahaan, tgl_hadir from undangan where nip = '" . $msg . "';";
         $result = mysqli_query($this->conn_db, $sql, MYSQLI_USE_RESULT);
 
@@ -74,14 +95,7 @@ class Chat implements MessageComponentInterface {
         }
 
         mysqli_free_result($result);
-        $sql = "update undangan set is_hadir = 1, tgl_hadir = now() where nip = '" . $msg . "'";
-        echo $sql . "\n";
         
-        if (mysqli_query($this->conn_db, $sql)) {
-          echo "Record updated successfully";
-        } else {
-          echo "Error updating record: " . mysqli_error($conn);
-        }
     }
 
     public function onClose(ConnectionInterface $conn) {
