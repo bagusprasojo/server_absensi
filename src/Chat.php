@@ -30,7 +30,7 @@ class Chat implements MessageComponentInterface {
         // $this->clients->attach($conn);
         echo "Koneksi baru! ({$conn->resourceId})\n";
 
-        $sql = "select id,nip,nama,jabatan,perusahaan, tgl_hadir from undangan where is_hadir=1";
+        $sql = "select id,nip,sapaan,nama,jabatan,perusahaan,text_to_speech,tgl_hadir from undangan where is_hadir=1";
         $result = mysqli_query($this->conn_db, $sql, MYSQLI_USE_RESULT);
 
         if ($result) {
@@ -38,10 +38,12 @@ class Chat implements MessageComponentInterface {
                 $data = array(
                     'ID' => $row[0],
                     'NIP' => $row[1],
-                    'Nama' => $row[2],
-                    'Jabatan' => $row[3],
-                    'Perusahaan' => $row[4],
-                    'Tanggal' => $row[5],                        
+                    'Sapaan' => $row[2],
+                    'Nama' => $row[3],
+                    'Jabatan' => $row[4],
+                    'Perusahaan' => $row[5],
+                    'TTS' => $row[6],
+                    'Tanggal' => $row[7],                        
                 );
 
                 $json[0] = $data;
@@ -65,8 +67,8 @@ class Chat implements MessageComponentInterface {
         } else {
           echo "Error updating record: " . mysqli_error($conn);
         }
-
-        $sql = "select id,nip,nama,jabatan,perusahaan, tgl_hadir from undangan where nip = '" . $msg . "';";
+        
+        $sql = "select id,nip,sapaan,nama,jabatan,perusahaan,text_to_speech,tgl_hadir from undangan where nip = '" . $msg . "';";
         $result = mysqli_query($this->conn_db, $sql, MYSQLI_USE_RESULT);
 
         foreach ($this->clients as $client) {
@@ -78,10 +80,12 @@ class Chat implements MessageComponentInterface {
                         $data = array(
                             'ID' => $row[0],
                             'NIP' => $row[1],
-                            'Nama' => $row[2],
-                            'Jabatan' => $row[3],
-                            'Perusahaan' => $row[4],
-                            'Tanggal' => $row[5],                        
+                            'Sapaan' => $row[2],
+                            'Nama' => $row[3],
+                            'Jabatan' => $row[4],
+                            'Perusahaan' => $row[5],
+                            'TTS' => $row[6],
+                            'Tanggal' => $row[7],                        
                         );
 
                         $json[$no] = $data;
@@ -95,7 +99,6 @@ class Chat implements MessageComponentInterface {
         }
 
         mysqli_free_result($result);
-        
     }
 
     public function onClose(ConnectionInterface $conn) {
