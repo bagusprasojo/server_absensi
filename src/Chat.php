@@ -40,28 +40,36 @@ class Chat implements MessageComponentInterface {
         // $this->clients->attach($conn);
         echo "Koneksi baru! ({$conn->resourceId})\n";
 
-        // $sql = "select id,nip,sapaan,nama,jabatan,perusahaan,text_to_speech,tgl_hadir from undangan where is_hadir=1";
-        // $result = mysqli_query($this->conn_db, $sql, MYSQLI_USE_RESULT);
+        
+    }
 
-        // if ($result) {
-        //     while ($row = mysqli_fetch_row($result)) {
-        //         $data = array(
-        //             'ID' => $row[0],
-        //             'NIP' => $row[1],
-        //             'Sapaan' => $row[2],
-        //             'Nama' => $row[3],
-        //             'Jabatan' => $row[4],
-        //             'Perusahaan' => $row[5],
-        //             'TTS' => $row[6],
-        //             'Tanggal' => $row[7],                        
-        //         );
+    private function sendTamuSudahHadir($from){
+        
+        $client = $this->getSender($from);
 
-        //         $json[0] = $data;
+        $sql = "select id,nip,sapaan,nama,jabatan,perusahaan,text_to_speech,tgl_hadir from undangan where is_hadir=1";
+        $result = mysqli_query($this->conn_db, $sql, MYSQLI_USE_RESULT);
 
-        //         $j = json_encode($json);
-        //         $conn->send($j);
-        //     }            
-        // }                   
+        if ($result) {
+            while ($row = mysqli_fetch_row($result)) {
+                $data = array(
+                    'ID' => $row[0],
+                    'NIP' => $row[1],
+                    'Sapaan' => $row[2],
+                    'Nama' => $row[3],
+                    'Jabatan' => $row[4],
+                    'Perusahaan' => $row[5],
+                    'TTS' => $row[6],
+                    'Tanggal' => $row[7],                        
+                );
+
+                $json[0] = $data;
+
+                $j = json_encode($json);
+                $client['conn']->send($j);
+                
+            }            
+        }                   
     }
 
     private function prosesMessagePrivate($destinations, $msg){
@@ -127,6 +135,7 @@ class Chat implements MessageComponentInterface {
             }
             
             mysqli_free_result($result);
+            
         } else if ($sender['nickname'] === "puzzle_trigger"){
             echo "Masuk puzzle_trigger \n";
             $this->prosesMessagePrivate(["puzzle"], "Mainkan");
@@ -160,6 +169,7 @@ class Chat implements MessageComponentInterface {
 
             case trim($msg) === '/display':                
                 $this->setNickName($from, 'display');
+                $this->sendTamuSudahHadir($from);
                 break;
 
             case trim($msg) === '/display_depan':                
