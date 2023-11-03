@@ -22,7 +22,7 @@
             },
             "require": {
                 "guzzlehttp/psr7": "^1.7|^2.0",
-                "php": ">=5.4.2",
+                "php": ">=7.0",
                 "ratchet/rfc6455": "^0.3.1",
                 "react/event-loop": ">=0.4",
                 "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5",
@@ -907,7 +907,7 @@
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1"
+                "php": ">=7.0"
             },
             "type": "library",
             "extra": {
@@ -974,7 +974,7 @@
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
+                "php": ">=7.0",
                 "symfony/deprecation-contracts": "^2.5|^3",
                 "symfony/polyfill-mbstring": "~1.1",
                 "symfony/polyfill-php83": "^1.27"
@@ -1297,7 +1297,7 @@
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
+                "php": ">=7.0",
                 "symfony/deprecation-contracts": "^2.5|^3"
             },
             "conflict": {
