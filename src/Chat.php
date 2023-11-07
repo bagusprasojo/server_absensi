@@ -12,7 +12,7 @@ class Chat implements MessageComponentInterface {
     public function __construct() {
         // $this->clients = new \SplObjectStorage;
 
-        if(!$this->conn_db = mysqli_connect("localhost","tsmarto", "Noki@3310","smart_building")) {
+        if(!$this->conn_db = mysqli_connect("localhost","root","","smart_building")) {
             die('No connection 1: ' . mysqli_connect_error());
         } else {
             echo "Koneksi DB Berhasil\n";
@@ -104,7 +104,7 @@ class Chat implements MessageComponentInterface {
             if (mysqli_query($this->conn_db, $sql)) {
               echo "Record updated successfully \n";
             } else {
-              echo "Error updating record: " . mysqli_error($conn);
+              echo "Error updating record: " . mysqli_error($this->conn_db);
             }
             
             $sql = "select id,nip,sapaan,nama,jabatan,perusahaan,text_to_speech,tgl_hadir from undangan where nip = '" . $msg . "';";
@@ -138,10 +138,13 @@ class Chat implements MessageComponentInterface {
             
         } else if ($sender['nickname'] === "puzzle_trigger"){
             echo "Masuk puzzle_trigger \n";
-            $this->prosesMessagePrivate(["puzzle"], "Mainkan");
+            $this->prosesMessagePrivate(["puzzle"], "Mainkan Puzzle");
         } else if ($sender['nickname'] === "peresmian_trigger"){
             echo "Masuk peresmian_trigger \n";
-            $this->prosesMessagePrivate(["puzzle"], "Mainkan");
+            $this->prosesMessagePrivate(["puzzle"], "Mainkan Peresmian");
+        } else if ($sender['nickname'] === "puzzle") {
+            echo $msg;
+            echo "\n";
         }
 
     }
@@ -190,12 +193,7 @@ class Chat implements MessageComponentInterface {
 
             default:
                 $this->prosesMessage($from, $msg);
-        } 
-
-
-
-        
-        
+        }
     }
 
     public function onClose(ConnectionInterface $conn) {        
