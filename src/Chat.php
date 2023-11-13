@@ -47,6 +47,11 @@ class Chat implements MessageComponentInterface {
         
         $client = $this->getSender($from);
 
+        $sql = "SELECT COUNT(*) total, SUM(ifnull(is_hadir, 0)) hadir FROM undangan LIMIT 1;";
+        $result = mysqli_query($this->conn_db, $sql);
+        $counts = mysqli_fetch_array($result, MYSQLI_NUM);
+        mysqli_free_result($result);
+
         $sql = "select id,nip,sapaan,nama,jabatan,perusahaan,text_to_speech,tgl_hadir from undangan where is_hadir=1";
         $result = mysqli_query($this->conn_db, $sql, MYSQLI_USE_RESULT);
 
@@ -64,6 +69,8 @@ class Chat implements MessageComponentInterface {
                 );
 
                 $json[0] = $data;
+                $json["total"] = $counts[0];
+                $json["hadir"] = $counts[1];
 
                 $j = json_encode($json);
                 $client['conn']->send($j);
@@ -98,6 +105,7 @@ class Chat implements MessageComponentInterface {
 
         $sender = $this->getSender($from);
         if ($sender['nickname'] === "checkin"){
+            $json = array();
             $sql = "update undangan set is_hadir = 1, tgl_hadir = now() where nip = '" . $msg . "'";
             echo $sql . "\n";
             
@@ -106,6 +114,11 @@ class Chat implements MessageComponentInterface {
             } else {
               echo "Error updating record: " . mysqli_error($this->conn_db);
             }
+
+            $sql = "SELECT COUNT(*) total, SUM(ifnull(is_hadir, 0)) hadir FROM undangan LIMIT 1;";
+            $result = mysqli_query($this->conn_db, $sql);
+            $counts = mysqli_fetch_array($result, MYSQLI_NUM);
+            mysqli_free_result($result);
             
             $sql = "select id,nip,sapaan,nama,jabatan,perusahaan,text_to_speech,tgl_hadir from undangan where nip = '" . $msg . "';";
             $result = mysqli_query($this->conn_db, $sql, MYSQLI_USE_RESULT);
@@ -127,6 +140,8 @@ class Chat implements MessageComponentInterface {
                     $json[$no] = $data;
                     $no++;
                 }
+                $json["total"] = $counts[0];
+                $json["hadir"] = $counts[1];
 
                 $j = json_encode($json);
                 $this->prosesMessagePrivate(['display','display_depan'], $j);
